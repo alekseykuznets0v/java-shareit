@@ -31,7 +31,8 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public Item update(Item item) {
-        return items.put(item.getId(), item);
+        items.put(item.getId(), item);
+        return items.get(item.getId());
     }
 
     @Override

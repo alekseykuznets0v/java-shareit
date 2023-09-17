@@ -31,7 +31,8 @@ public class UserStorageImpl implements UserStorage {
 
     @Override
     public User update(User user) {
-        return users.put(user.getId(), user);
+        users.put(user.getId(), user);
+        return users.get(user.getId());
     }
 
     @Override

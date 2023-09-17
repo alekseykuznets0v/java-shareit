@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  */
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Item {
     private Long id;
     private User owner;
