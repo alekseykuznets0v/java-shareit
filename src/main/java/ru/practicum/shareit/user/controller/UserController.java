@@ -57,8 +57,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
+    public String delete(@PathVariable Long id) {
         log.info("Получен запрос DELETE /users/" + id);
         userService.deleteUserById(id);
+        return "Пользователь с id=" + id + " удален";
     }
 }

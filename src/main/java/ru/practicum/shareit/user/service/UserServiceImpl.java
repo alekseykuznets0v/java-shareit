@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.AlreadyExistsException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -22,6 +23,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserDto userDto) {
+        String email = userDto.getEmail();
+        if (isEmailExist(email)) {
+            throw new AlreadyExistsException(String.format("Пользователь с email=%s уже существует", email));
+        }
         User user = toUser(userDto);
         User savedUser = userStorage.create(user);
         return toUserDto(savedUser);
@@ -49,11 +54,19 @@ public class UserServiceImpl implements UserService {
         if (user.isEmpty()) {
             throw new NotFoundException(String.format("Пользователь с id=%s не найден", id));
         }
-        User oldUser = user.get();
-        User userToUpdate = oldUser.toBuilder()
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .build();
+        User userToUpdate = user.get();
+        String newName = userDto.getName();
+        String newEmail = userDto.getEmail();
+
+        if (newName != null) {
+            userToUpdate.setName(newName);
+        }
+        if (newEmail != null && !newEmail.equals(userToUpdate.getEmail())) {
+            if (isEmailExist(newEmail)) {
+                throw new AlreadyExistsException(String.format("Пользователь с email=%s уже существует", newEmail));
+            }
+            userToUpdate.setEmail(newEmail);
+        }
         return toUserDto(userStorage.update(userToUpdate));
     }
 
@@ -63,5 +76,12 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException(String.format("Пользователь с id=%s не найден", id));
         }
         userStorage.deleteById(id);
+    }
+
+    private boolean isEmailExist(String email) {
+        Optional<User> optionalUser = userStorage.getAll().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+        return optionalUser.isPresent();
     }
 }

@@ -66,18 +66,24 @@ public class ItemServiceImpl implements ItemService {
            throw new NotFoundException(String.format("Пользователь с id=%s не найден", userId));
        }
 
-       Item oldItem = item.get();
-       Long oldItemUserId = oldItem.getOwner().getId();
+       Item itemToUpdate = item.get();
+       Long itemToUpdateUserId = itemToUpdate.getOwner().getId();
+       String newName = itemDto.getName();
+       String newDescription = itemDto.getDescription();
+       Boolean newAvailability = itemDto.getAvailable();
 
-       if (!oldItemUserId.equals(userId)) {
+       if (!itemToUpdateUserId.equals(userId)) {
            throw new NotFoundException(String.format("У пользователя с id=%s нет вещи с id=%s", userId, id));
        }
-
-       Item itemToUpdate = oldItem.toBuilder()
-               .name(itemDto.getName())
-               .description(itemDto.getDescription())
-               .available(itemDto.getAvailable())
-               .build();
+       if (newName != null) {
+           itemToUpdate.setName(newName);
+       }
+       if (newDescription != null) {
+           itemToUpdate.setDescription(newDescription);
+       }
+       if (newAvailability != null) {
+           itemToUpdate.setAvailable(newAvailability);
+       }
        return toItemDto(itemStorage.update(itemToUpdate));
     }
 
