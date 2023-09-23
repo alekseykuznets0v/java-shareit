@@ -1,12 +1,11 @@
 package ru.practicum.shareit.user.service;
 
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.AlreadyExistsException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.storage.InMemoryUserStorage;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,18 +14,14 @@ import static ru.practicum.shareit.user.mapper.UserMapper.*;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final InMemoryUserStorage userStorage;
 
-    public UserServiceImpl(UserStorage userStorage) {
+    public UserServiceImpl(InMemoryUserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     @Override
     public UserDto create(UserDto userDto) {
-        String email = userDto.getEmail();
-        if (userStorage.isEmailExist(email)) {
-            throw new AlreadyExistsException(String.format("Пользователь с email=%s уже существует", email));
-        }
         User user = toUser(userDto);
         User savedUser = userStorage.create(user);
         return toUserDto(savedUser);
@@ -41,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long id) {
-        Optional<User> user = userStorage.getUserById(id);
+        Optional<User> user = userStorage.getById(id);
         if (user.isEmpty()) {
             throw new NotFoundException(String.format("Пользователь с id=%s не найден", id));
         }
@@ -50,36 +45,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto, Long id) {
-        Optional<User> user = userStorage.getUserById(id);
+        Optional<User> user = userStorage.getById(id);
         if (user.isEmpty()) {
             throw new NotFoundException(String.format("Пользователь с id=%s не найден", id));
         }
-        /*
-        Optional<User> user = userStorage.getUserById(userId);
-
-        if (user.isEmpty()) {
-            throw new NotFoundException(String.format("Пользователь с id=%s не найден", userId));
-        }
-
-        Item oldItem = item.get();
-        Long oldItemUserId = oldItem.getOwner().getId();
-
-        if (!oldItemUserId.equals(userId)) {
-            throw new NotFoundException(String.format("У пользователя с id=%s нет вещи с id=%s", userId, id));
-        }
-
-        Item itemToUpdate = oldItem.toBuilder()
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
+        User oldUser = user.get();
+        User userToUpdate = oldUser.toBuilder()
+                .name(userDto.getName())
+                .email(userDto.getEmail())
                 .build();
-        return toItemDto(itemStorage.update(itemToUpdate));
-        */
-        return null;
+        return toUserDto(userStorage.update(userToUpdate));
     }
 
     @Override
     public void deleteUserById(Long id) {
-
+        if (!userStorage.isIdExist(id)) {
+            throw new NotFoundException(String.format("Пользователь с id=%s не найден", id));
+        }
+        userStorage.deleteById(id);
     }
 }
