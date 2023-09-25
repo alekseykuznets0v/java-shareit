@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import ru.practicum.shareit.utility.validation.OnCreate;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,13 +14,14 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemDto {
     private Long id;
-    @NotNull
-    @NotBlank
+    @NotNull(groups = OnCreate.class)
+    @NotBlank(groups = OnCreate.class)
     private String name;
-    @NotBlank
+    @NotBlank(groups = OnCreate.class)
     private String description;
-    @NotNull
+    @NotNull(groups = OnCreate.class)
     private Boolean available;
 }

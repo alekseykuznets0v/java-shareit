@@ -5,9 +5,9 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.InMemoryItemStorage;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.InMemoryUserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,10 +18,10 @@ import static ru.practicum.shareit.item.mapper.ItemMapper.*;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private final InMemoryItemStorage itemStorage;
-    private final InMemoryUserStorage userStorage;
+    private final ItemRepository itemStorage;
+    private final UserRepository userStorage;
 
-    public ItemServiceImpl(InMemoryItemStorage itemStorage, InMemoryUserStorage userStorage) {
+    public ItemServiceImpl(ItemRepository itemStorage, UserRepository userStorage) {
         this.itemStorage = itemStorage;
         this.userStorage = userStorage;
     }
@@ -98,12 +98,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> searchByText(String text) {
         if (text.isBlank()) return Collections.emptyList();
-        return itemStorage.getAll().stream()
-                .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase()) ||
-                                item.getDescription().toLowerCase().contains(text.toLowerCase())) &&
-                                item.getAvailable()
-                )
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemStorage.searchByText(text);
     }
 }

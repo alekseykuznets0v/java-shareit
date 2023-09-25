@@ -6,7 +6,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.InMemoryUserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,16 +15,16 @@ import static ru.practicum.shareit.user.mapper.UserMapper.*;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final InMemoryUserStorage userStorage;
+    private final UserRepository userStorage;
 
-    public UserServiceImpl(InMemoryUserStorage userStorage) {
+    public UserServiceImpl(UserRepository userStorage) {
         this.userStorage = userStorage;
     }
 
     @Override
     public UserDto create(UserDto userDto) {
         String email = userDto.getEmail();
-        if (isEmailExist(email)) {
+        if (!userStorage.saveEmailIfNotExists(email)) {
             throw new AlreadyExistsException(String.format("Пользователь с email=%s уже существует", email));
         }
         User user = toUser(userDto);
@@ -56,15 +56,17 @@ public class UserServiceImpl implements UserService {
         }
         User userToUpdate = user.get();
         String newName = userDto.getName();
+        String oldEmail = userToUpdate.getEmail();
         String newEmail = userDto.getEmail();
 
         if (newName != null) {
             userToUpdate.setName(newName);
         }
-        if (newEmail != null && !newEmail.equals(userToUpdate.getEmail())) {
-            if (isEmailExist(newEmail)) {
+        if (newEmail != null && !newEmail.equals(oldEmail)) {
+            if (!userStorage.saveEmailIfNotExists(newEmail)) {
                 throw new AlreadyExistsException(String.format("Пользователь с email=%s уже существует", newEmail));
             }
+            userStorage.deleteEmail(oldEmail);
             userToUpdate.setEmail(newEmail);
         }
         return toUserDto(userStorage.update(userToUpdate));
@@ -75,13 +77,8 @@ public class UserServiceImpl implements UserService {
         if (!userStorage.isIdExist(id)) {
             throw new NotFoundException(String.format("Пользователь с id=%s не найден", id));
         }
+        UserDto userDto = getUserById(id);
+        userStorage.deleteEmail(userDto.getEmail());
         userStorage.deleteById(id);
-    }
-
-    private boolean isEmailExist(String email) {
-        Optional<User> optionalUser = userStorage.getAll().stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst();
-        return optionalUser.isPresent();
     }
 }

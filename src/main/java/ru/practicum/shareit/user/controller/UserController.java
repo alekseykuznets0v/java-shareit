@@ -2,12 +2,14 @@ package ru.practicum.shareit.user.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.utility.validation.OnCreate;
+import ru.practicum.shareit.utility.validation.OnUpdate;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping(path = "/users")
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -24,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Valid @RequestBody UserDto userDto, Errors errors) {
+    public UserDto create(@RequestBody @Validated(OnCreate.class) UserDto userDto, Errors errors) {
         log.info("Получен запрос POST /users/ " + userDto);
         if (errors.hasErrors()) {
             throw new ValidationException("Произошла ошибка валидации - " + errors.getAllErrors());
@@ -46,7 +49,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@RequestBody UserDto userDto,
+    public UserDto update(@RequestBody @Validated(OnUpdate.class) UserDto userDto,
                           @PathVariable long id, Errors errors) {
         log.info("Получен запрос PATCH /users/" + id + " с телом: " + userDto);
         if (errors.hasErrors()) {

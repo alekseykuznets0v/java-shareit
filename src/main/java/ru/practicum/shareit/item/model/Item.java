@@ -4,9 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utility.Entity;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 /**
  * TODO Sprint add-controllers.
  */
@@ -16,12 +13,8 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class Item extends Entity {
     private User owner;
-    @NotNull
-    @NotBlank
     private String name;
-    @NotBlank
     private String description;
-    @NotNull
     private Boolean available;
 
     @Builder(toBuilder = true)

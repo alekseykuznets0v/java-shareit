@@ -3,9 +3,6 @@ package ru.practicum.shareit.user.model;
 import lombok.*;
 import ru.practicum.shareit.utility.Entity;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
 /**
  * TODO Sprint add-controllers.
  */
@@ -14,10 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class User extends Entity {
-    @NotBlank
     private String name;
-    @NotBlank
-    @Email
     private String email;
 
     @Builder(toBuilder = true)
