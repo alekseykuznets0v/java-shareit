@@ -1,27 +1,22 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.utility.validation.OnCreate;
+import ru.practicum.shareit.utility.validation.OnUpdate;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-/**
- * TODO Sprint add-controllers.
- */
 
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ItemDto {
+public class UserDto {
     private Long id;
-    @NotNull(groups = OnCreate.class)
     @NotBlank(groups = OnCreate.class)
     private String name;
     @NotBlank(groups = OnCreate.class)
-    private String description;
-    @NotNull(groups = OnCreate.class)
-    private Boolean available;
+    @Email(groups = {OnCreate.class, OnUpdate.class})
+    private String email;
 }
