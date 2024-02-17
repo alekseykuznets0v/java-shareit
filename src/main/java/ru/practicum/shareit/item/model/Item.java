@@ -4,10 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utility.Entity;
 
-/**
- * TODO Sprint add-controllers.
- */
-
 @EqualsAndHashCode(callSuper = false)
 @Getter
 @Setter

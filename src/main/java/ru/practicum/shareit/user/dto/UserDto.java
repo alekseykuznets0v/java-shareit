@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.utility.validation.OnCreate;
 import ru.practicum.shareit.utility.validation.OnUpdate;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 

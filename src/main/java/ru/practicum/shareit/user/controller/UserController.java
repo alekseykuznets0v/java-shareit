@@ -12,9 +12,6 @@ import ru.practicum.shareit.utility.validation.OnUpdate;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @Slf4j
 @RequestMapping(path = "/users")
